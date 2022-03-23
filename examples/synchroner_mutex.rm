@@ -1,0 +1,31 @@
+module Q1 is
+  interface error: B; pc1, pc2: { in_cs, out_cs, req_cs }
+
+  lazy atom A1 controls pc1 reads pc1, pc2
+  init
+    [] True -> pc1´ := out_cs
+  update
+    [] pc1 == out_cs                ->
+    [] pc1 == out_cs                -> pc1´ := req_cs
+    [] pc1 == req_cs & pc2 != in_cs -> pc1´ := in_cs
+    [] pc1 == req_cs & pc2 == in_cs ->
+    [] pc1 == in_cs                 ->
+    [] pc1 == in_cs                 -> pc1´ := out_cs
+
+  lazy atom A2 controls pc2 reads pc1, pc2
+  init
+    [] True -> pc2´ := out_cs
+  update
+    [] pc2 == out_cs                 ->
+    [] pc2 == out_cs                 -> pc2´ := req_cs
+    [] pc2 == req_cs & pc1 == out_cs -> pc2´ := in_cs
+    [] pc2 == req_cs & pc1 != out_cs ->
+    [] pc2 == in_cs                  ->
+    [] pc2 == in_cs                  -> pc2´ := out_cs
+
+  atom Monitor controls error reads pc1, pc2
+  init
+    [] True -> error´ := False
+  update
+    [] pc1 == in_cs & pc2 == in_cs -> error´ := True
+    [] pc1 != in_cs | pc2 != in_cs ->

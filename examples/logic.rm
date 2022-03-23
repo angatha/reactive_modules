@@ -1,0 +1,45 @@
+module SyncNot is
+  interface out: B
+  external in: B
+
+  atom Sync_Not controls out awaits in
+  initupdate
+    [] in´ == False -> out´ := True
+    [] in´ == True -> out´ := False
+
+module SyncAnd is
+  interface out: B
+  external in1, in2: B
+
+  atom Sync_And controls out awaits in1, in2
+  initupdate
+    [] in1´ == False | in2´ == False -> out´ := False
+    [] in1´ == True & in2´ == True -> out´ := True
+
+SyncOr := hide z1, z2, z3 in (SyncAnd[in1 := z1, in2 := z2, out := z3] || SyncNot[in := in1, out := z1] || SyncNot[
+      in := in2, out := z2] || SyncNot[in := z3])
+
+module Controller is
+  private s: { 0, 1, 2, 3 }
+  interface out1, out2: B
+
+  atom C controls out1, out2, s reads s
+  init
+    [] True -> s´ := 0; out1´ := False; out2´ := False
+  update
+    [] s == 0 -> s´ := 1; out1´ := True; out2´ := False
+    [] s == 1 -> s´ := 2; out1´ := False; out2´ := True
+    [] s == 2 -> s´ := 3; out1´ := True; out2´ := True
+    [] s == 3 -> s´ := 0; out1´ := False; out2´ := False
+
+module ControllerR is
+  interface out1, out2: B
+
+  atom C controls out1, out2
+  initupdate
+    [] True -> out1´ := B; out2´ := B
+
+ControlledSyncOr := SyncOr || Controller[out1 := in1, out2 := in2]
+
+
+run SyncOr

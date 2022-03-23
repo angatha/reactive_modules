@@ -1,0 +1,34 @@
+module Scheduler is
+  interface t: N
+
+  atom Test controls t reads t
+  init
+    [] True -> t´ := 0
+  update
+    [] True -> t´ := t + 1
+
+module Module2 is
+  interface i: B
+  external t: N
+
+  atom T controls i awaits t
+  init
+    [] True -> i´ := False
+  update
+    [] t´ > 10  -> i´ := False
+    [] t´ <= 10 -> i´ := True
+
+module Task is
+  interface new: N
+
+  atom T controls new
+  initupdate
+    [] True -> new´ := 0
+    [] True -> new´ := 5
+
+Task1 := Task[new:=new1]
+Task2 := Task[new:=new2]
+Combined := Scheduler || Module2
+
+
+run Task1 || Task2
