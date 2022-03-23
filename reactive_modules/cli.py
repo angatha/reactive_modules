@@ -140,7 +140,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
                                             'code and interpreting it. You need to use the individual sub-command for '
                                             'the different tasks.')
     # create the pars for the "a" command
-    format_parser = subparsers.add_parser('format', help='Formatting one or more files')
+    format_parser = subparsers.add_parser('format', help='Formatting one or more files.')
     format_parser.add_argument('input', nargs='+', type=argparse.FileType('r', encoding='UTF-8'), metavar='INPUT',
                                help='A list of files to format. Pass - to read just from standard in. If output is '
                                     'specified, all content of all input is appended with a line break and then '
@@ -170,15 +170,10 @@ def create_arg_parser() -> argparse.ArgumentParser:
                                help='Specify how many characters should be at most in one line.')
     format_parser.set_defaults(func=format_code)
 
-    check_parser = subparsers.add_parser('check', help='Formatting one or more files')
+    check_parser = subparsers.add_parser('check',
+                                         help='Check one or more files for syntactic and some semantic errors.')
     check_parser.add_argument('input', nargs='+', type=argparse.FileType('r', encoding='UTF-8'), metavar='INPUT',
-                              help='A list of files to format. Pass - to read just from standard in. If output is '
-                                   'specified, all content of all input is appended with a line break and then '
-                                   'written to output. In verbose mode, the source file name is prepended as a '
-                                   'comment. If output is not specified, the files are formatted in place (standard '
-                                   'in is written to standard out respectively). If the input file contains '
-                                   'syntactical errors, errors are printed to standard error and the content of this '
-                                   'file are not written.')
+                              help='A list of files to check. Pass - to read just from standard in.')
     check_parser.add_argument('-f', '--force', action='store_true',
                               help='Disable warning for analysing something that is not a .rm file.')
     check_parser.set_defaults(func=check)
